@@ -1,0 +1,6 @@
+flask
+gunicorn
+line-bot-sdk
+groq
+python-dotenv
+requests

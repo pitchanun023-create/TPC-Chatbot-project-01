@@ -56,8 +56,11 @@ def get_data_updated():
 
 
 def build_prompt(data, today):
-    # สร้าง system prompt จากข้อมูลวิทยาลัยกับวันที่วันนี้
-    return f"""คุณเป็นผู้ช่วยของวิทยาลัย คุยเป็นกันเอง สุภาพ และเข้าถึงง่าย
+    bot_name = "ZixZax Chatbot"  
+    creator_name = "Pitchanun and Srikarin"
+    return f"""คุณเป็นผู้ช่วยของวิทยาลัย ชื่อของคุณคือ {bot_name} สร้างและพัฒนาโดย {creator_name}
+คุยเป็นกันเอง สุภาพ และเข้าถึงง่าย
+    
 
 วันนี้คือ {today}
 

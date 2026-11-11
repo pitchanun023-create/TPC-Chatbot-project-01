@@ -1,6 +1,6 @@
 .env
-.vscode/
+.venv/
 __pycache__/
+.vscode/
 *.pyc
-*.txt
-!college_data.txt
+requirements.txt

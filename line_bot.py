@@ -6,6 +6,8 @@ line_bot.py - ตัวรับ webhook จาก LINE แล้วส่งต
 import os
 import inspect
 import logging
+import time
+from collections import defaultdict, deque
 
 from dotenv import load_dotenv
 from flask import Flask, request, abort
@@ -42,6 +44,24 @@ LINE_TEXT_LIMIT = 4900  # LINE ส่งข้อความได้ไม่�
 
 # ประวัติแชทแยกตามผู้ใช้ (เก็บในหน่วยความจำ จะหายเมื่อเซิร์ฟเวอร์รีสตาร์ต)
 histories = {}
+
+# ระบบจำกัดความถี่ (Rate Limiting): จำกัด 6 ข้อความต่อ 1 นาทีต่อคน
+hits = defaultdict(deque)
+PER_MINUTE = 6
+
+def too_fast(uid):
+    now = time.time()
+    q = hits[uid]
+    
+    # ลบประวัติเวลาที่เกิน 1 นาทีออก
+    while q and q[0] < now - 60:
+        q.popleft()
+        
+    if len(q) >= PER_MINUTE:
+        return True
+        
+    q.append(now)
+    return False
 
 
 def get_answer(question, history):
@@ -84,6 +104,12 @@ def on_message(event):
         return
 
     user_id = getattr(event.source, "user_id", None) or "unknown"
+
+    # เช็กว่าส่งข้อความเร็วเกินกำหนดหรือไม่[cite: 8]
+    if too_fast(user_id):
+        reply(event, "คุณส่งข้อความเร็วเกินไปครับ กรุณารอสักครู่นแล้วลองใหม่อีกครั้งนะครับ")
+        return
+
     history = histories.setdefault(user_id, [])
 
     try:
